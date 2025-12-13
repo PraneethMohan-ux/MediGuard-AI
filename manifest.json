@@ -8,14 +8,14 @@
   "theme_color": "#006a6a",
   "icons": [
     {
-      "src": "https://cdn.lucide.dev/shield-check.svg",
+      "src": "logo.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "https://cdn.lucide.dev/shield-check.svg",
+      "src": "logo.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }
