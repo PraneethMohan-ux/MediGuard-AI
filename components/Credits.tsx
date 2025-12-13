@@ -1,12 +1,16 @@
+
 import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
+import { UI_TRANSLATIONS, Language } from '../types';
 
 interface CreditsProps {
     onTriggerEasterEgg: (type: 'bw' | 'neon' | 'modal' | 'hindi' | 'bomb' | 'clear') => void;
+    language?: Language;
 }
 
-const Credits: React.FC<CreditsProps> = ({ onTriggerEasterEgg }) => {
+const Credits: React.FC<CreditsProps> = ({ onTriggerEasterEgg, language }) => {
   const [clickState, setClickState] = useState<Record<string, { count: number, lastClick: number }>>({});
+  const t = UI_TRANSLATIONS[language || 'en'] || UI_TRANSLATIONS['en'];
 
   const handleSmartClick = (name: string, eggType: 'bw' | 'neon' | 'modal' | 'hindi' | 'bomb') => {
       const now = Date.now();
@@ -42,9 +46,9 @@ const Credits: React.FC<CreditsProps> = ({ onTriggerEasterEgg }) => {
   return (
     <div className="p-8 h-full flex flex-col items-center space-y-8 overflow-y-auto animate-fade-in">
       <div className="text-center space-y-2 mt-4">
-         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Credits</h1>
-         <p className="text-sm text-gray-500 dark:text-gray-400">Meet the Team</p>
-         <p className="text-xs text-gray-300 dark:text-gray-600">(Double tap names)</p>
+         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t.credits}</h1>
+         <p className="text-sm text-gray-500 dark:text-gray-400">{t.meetTeam}</p>
+         <p className="text-xs text-gray-300 dark:text-gray-600">{t.doubleTap}</p>
       </div>
 
       <div className="w-full max-w-sm space-y-3">
@@ -63,7 +67,7 @@ const Credits: React.FC<CreditsProps> = ({ onTriggerEasterEgg }) => {
       </div>
 
       <div className="mt-auto pt-8 flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
-        <span>Made with</span>
+        <span>{t.madeWith}</span>
         <Heart size={16} className="text-red-400 fill-red-400 animate-pulse" />
       </div>
     </div>

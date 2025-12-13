@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Menu, MessageSquare, Sun, Moon } from 'lucide-react';
 import NavigationDrawer from './components/NavigationDrawer';
@@ -114,9 +115,9 @@ const App: React.FC = () => {
       case 'chat':
         return <ChatScreen profile={profile} language={language} messages={chatHistory} setMessages={setChatHistory} />;
       case 'emergency':
-        return <Emergency profile={profile} />;
+        return <Emergency profile={profile} language={language} />;
       case 'credits':
-        return <Credits onTriggerEasterEgg={handleEasterEggTrigger} />;
+        return <Credits onTriggerEasterEgg={handleEasterEggTrigger} language={language} />;
       case 'settings':
         return <Settings language={language} setLanguage={setLanguage} profile={profile} updateProfile={setProfile} />;
       default:

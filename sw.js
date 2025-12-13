@@ -1,10 +1,10 @@
 
 const CACHE_NAME = 'mediguard-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/index.tsx',
-  '/manifest.json'
+  './',
+  'index.html',
+  'index.tsx',
+  'manifest.json'
 ];
 
 self.addEventListener('install', event => {

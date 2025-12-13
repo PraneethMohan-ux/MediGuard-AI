@@ -1,7 +1,8 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, Paperclip, Trash2, ChevronRight, X, Edit3 } from 'lucide-react';
 import MessageBubble from './MessageBubble';
-import { UserProfile, ChatMessage, Language } from '../types';
+import { UserProfile, ChatMessage, Language, UI_TRANSLATIONS } from '../types';
 import { sendMessageToGemini } from '../services/geminiService';
 
 interface ChatScreenProps {
@@ -19,6 +20,8 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ profile, language, messages, se
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const initializedRef = useRef(false);
 
+  const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['en'];
+
   // Initial Greeting (only if empty)
   useEffect(() => {
     if (!initializedRef.current && messages.length === 0) {
@@ -26,13 +29,13 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ profile, language, messages, se
             id: 'init',
             role: 'model',
             text: profile 
-              ? `Hello ${profile.name}. I have your profile (Age: ${profile.age}). What meds would you like to check?`
-              : `Hello. Please sign in for personalized safety checks. I can still answer general queries.`,
+              ? `${t.welcome} ${profile.name}. ${t.profileActive} (${t.age}: ${profile.age}). ${t.typeQuery}`
+              : `${t.welcome}. ${t.typeQuery}`,
             timestamp: new Date(),
         }]);
         initializedRef.current = true;
     }
-  }, [profile, messages.length, setMessages]);
+  }, [profile, messages.length, setMessages, t]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -93,25 +96,25 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ profile, language, messages, se
       {/* Profile Sidebar (Desktop/Mobile Toggle) */}
       <div className={`absolute inset-y-0 right-0 w-64 bg-white dark:bg-neutral-900 shadow-2xl z-20 transform transition-transform duration-300 border-l border-gray-100 dark:border-neutral-800 ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="p-4 border-b border-gray-100 dark:border-neutral-800 flex justify-between items-center">
-              <h3 className="font-bold text-gray-700 dark:text-gray-200">Medical Profile</h3>
+              <h3 className="font-bold text-gray-700 dark:text-gray-200">{t.medicalProfile}</h3>
               <button onClick={() => setSidebarOpen(false)} className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"><X size={20} /></button>
           </div>
           <div className="p-4 space-y-4 text-sm">
              {profile ? (
                  <>
                    <div className="bg-gray-50 dark:bg-neutral-800 p-3 rounded-xl">
-                       <span className="text-xs text-gray-400 block">Age</span>
-                       <span className="font-medium dark:text-gray-200">{profile.age} years</span>
+                       <span className="text-xs text-gray-400 block">{t.age}</span>
+                       <span className="font-medium dark:text-gray-200">{profile.age} {t.years}</span>
                    </div>
                    <div className="bg-gray-50 dark:bg-neutral-800 p-3 rounded-xl">
-                       <span className="text-xs text-gray-400 block">Kidney Function</span>
+                       <span className="text-xs text-gray-400 block">{t.kidneyFunction}</span>
                        <span className="font-medium dark:text-gray-200">{profile.kidneyFunction}</span>
                    </div>
                    <div className="bg-gray-50 dark:bg-neutral-800 p-3 rounded-xl">
-                       <span className="text-xs text-gray-400 block">Current Meds</span>
+                       <span className="text-xs text-gray-400 block">{t.currentMeds}</span>
                        <span className="font-medium dark:text-gray-200">{profile.currentMeds || "None"}</span>
                    </div>
-                   <button className="w-full py-2 text-primary dark:text-teal-400 text-xs font-bold border border-primary/20 dark:border-teal-500/30 rounded-lg hover:bg-primary/5 dark:hover:bg-teal-500/10">Edit Profile</button>
+                   <button className="w-full py-2 text-primary dark:text-teal-400 text-xs font-bold border border-primary/20 dark:border-teal-500/30 rounded-lg hover:bg-primary/5 dark:hover:bg-teal-500/10">{t.editProfile}</button>
                  </>
              ) : (
                  <p className="text-gray-500 italic">No profile loaded.</p>
@@ -136,7 +139,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ profile, language, messages, se
             <div className="flex justify-start w-full">
                 <div className="flex items-center gap-3 bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 px-5 py-4 rounded-[24px] rounded-tl-none shadow-sm">
                 <Loader2 className="w-5 h-5 text-primary dark:text-teal-400 animate-spin" />
-                <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Analyzing safety...</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">{t.analyzing}</span>
                 </div>
             </div>
             )}
@@ -161,7 +164,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ profile, language, messages, se
                          <input
                             value={inputText}
                             onChange={(e) => setInputText(e.target.value)}
-                            placeholder="Type drug name or query..."
+                            placeholder={t.typeQuery}
                             className="flex-1 bg-transparent border-none outline-none text-sm text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                          />

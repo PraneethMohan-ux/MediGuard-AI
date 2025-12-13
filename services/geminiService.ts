@@ -1,5 +1,5 @@
 
-import { UserProfile, ChatMessage } from "../types";
+import { UserProfile, ChatMessage, UI_TRANSLATIONS, Language } from "../types";
 
 // Enhanced Drug Database based on Indian Pharmacopoeia (IP) & NLEM 2022 Standards
 interface DrugInfo {
@@ -164,6 +164,45 @@ const DRUG_DB: Record<string, DrugInfo> = {
     habitForming: false,
     pregnancyUnsafe: true // Category C
   },
+  "meropenem": {
+    class: "Carbapenem Antibiotic (NLEM 2022)",
+    indication: "Severe bacterial infections (Meningitis, Intra-abdominal)",
+    schedule: "Schedule H",
+    kidney: "Adjust dose in renal impairment.",
+    liver: "Generally safe.",
+    interactions: ["Valproic acid (Reduces levels)", "Probenecid"],
+    sideEffects: ["Nausea", "Diarrhea", "Seizures (Rare)"],
+    warnings: ["Do not use if allergic to beta-lactams.", "Risk of seizures in patients with CNS disorders."],
+    bbb: true, // Crosses inflamed meninges
+    habitForming: false,
+    pregnancyUnsafe: false // Category B
+  },
+  "montelukast": {
+    class: "Leukotriene Receptor Antagonist (NLEM 2022)",
+    indication: "Asthma, Allergic Rhinitis",
+    schedule: "Schedule H",
+    kidney: "Safe.",
+    liver: "Use with caution.",
+    interactions: ["Phenytoin", "Phenobarbital"],
+    sideEffects: ["Mood changes", "Headache"],
+    warnings: ["Take in the evening.", "Boxed Warning: Serious neuropsychiatric events (agitation, depression)."],
+    bbb: false,
+    habitForming: false,
+    pregnancyUnsafe: false
+  },
+  "mupirocin": {
+    class: "Topical Antibiotic (NLEM 2022)",
+    indication: "Impetigo, Skin infections (Staph/Strep)",
+    schedule: "Schedule H",
+    kidney: "Safe (Topical). Caution with PEG ointment in renal failure.",
+    liver: "Safe.",
+    interactions: ["None significant topically"],
+    sideEffects: ["Burning sensation", "Itching"],
+    warnings: ["For external use only.", "Do not use in eyes or on large open wounds."],
+    bbb: false,
+    habitForming: false,
+    pregnancyUnsafe: false
+  },
 
   // --- ANTIBIOTICS ---
   "amoxicillin": {
@@ -313,19 +352,6 @@ const DRUG_DB: Record<string, DrugInfo> = {
     interactions: ["Alcohol", "Sedatives"],
     sideEffects: ["Drowsiness", "Dry mouth"],
     warnings: ["May cause mild drowsiness.", "Contraindicated in end stage renal disease."],
-    bbb: false,
-    habitForming: false,
-    pregnancyUnsafe: false
-  },
-  "montelukast": {
-    class: "Leukotriene Receptor Antagonist (NLEM 2022)",
-    indication: "Asthma, Allergy",
-    schedule: "Schedule H",
-    kidney: "Safe.",
-    liver: "Caution.",
-    interactions: ["Phenytoin", "Phenobarbital"],
-    sideEffects: ["Mood changes", "Headache"],
-    warnings: ["Take in the evening.", "Contraindicated in patients with hypersensitivity to the drug."],
     bbb: false,
     habitForming: false,
     pregnancyUnsafe: false
@@ -540,6 +566,9 @@ export const sendMessageToGemini = async (
   const userAge = parseInt(profile.age || '0');
   const isFemale = profile.gender === 'Female';
   const isChildbearingAge = isFemale && userAge >= 18 && userAge <= 50;
+  
+  // Critical Profile Check
+  const profileIncomplete = !profile.age || profile.gender === 'Unknown';
 
   // 2. Image handling
   const lastMsg = history[history.length - 1];
@@ -553,6 +582,7 @@ export const sendMessageToGemini = async (
   if (foundDrugKeys.length > 0) {
       // --- INTERACTION CHECKS (Top Priority) ---
       let interactionsDetected = false;
+      let askForRiskProfile = false;
 
       // A. Query vs Query (Drug + Drug)
       for (let i = 0; i < foundDrugKeys.length; i++) {
@@ -605,6 +635,11 @@ export const sendMessageToGemini = async (
                   }
               });
           }
+          
+          // Check for high risk flags to trigger prompt
+          if (drug.habitForming || drug.bbb || drug.pregnancyUnsafe || key === 'alcohol') {
+              askForRiskProfile = true;
+          }
       });
 
       if (interactionsDetected) responseText += `\n`;
@@ -649,7 +684,8 @@ export const sendMessageToGemini = async (
           // Side Effects
           responseText += `\n**Side Effects**: ${drug.sideEffects.slice(0, 3).join(", ")}\n`;
           
-          responseText += `[BUY:${drugName}]\n\n`;
+          responseText += `[BUY:${drugName}]\n`;
+          responseText += `[WEB:${drugName}]\n\n`;
       });
 
       // --- SUMMARIES ---
@@ -658,6 +694,12 @@ export const sendMessageToGemini = async (
           const drugName = key.charAt(0).toUpperCase() + key.slice(1);
           responseText += `SUMMARY: **${drugName}** is classified as a ${drug.class} and is primarily used for ${drug.indication}. \n`;
       });
+      
+      // CRITICAL: Ask for Age/Pregnancy if needed and incomplete profile
+      if (askForRiskProfile && profileIncomplete) {
+          const t = UI_TRANSLATIONS[language as keyof typeof UI_TRANSLATIONS] || UI_TRANSLATIONS['en'];
+          responseText += `\n[RED]${t.askRisk || "CRITICAL: High risk medication detected. Please confirm your Age and Pregnancy Status."}[/RED]`;
+      }
 
   } else {
      // --- ONLINE FALLBACK ---
@@ -666,6 +708,7 @@ export const sendMessageToGemini = async (
      const queries = parts.length > 1 ? parts : [message];
      
      let foundOnline = false;
+     let onlineRiskDetected = false;
 
      for (const q of queries) {
          let wiki = await fetchWikipediaData(q);
@@ -689,12 +732,17 @@ export const sendMessageToGemini = async (
              // Dynamic Red Text
              const lowerEx = wiki.extract.toLowerCase();
              
-             if (lowerEx.includes("blood-brain barrier")) responseText += `CRITICAL: 🧠 Crosses BBB.\n`;
+             if (lowerEx.includes("blood-brain barrier")) {
+                 responseText += `CRITICAL: 🧠 Crosses BBB.\n`;
+                 onlineRiskDetected = true;
+             }
              if (lowerEx.includes("addict") || lowerEx.includes("habit-forming") || lowerEx.includes("dependence")) {
                  responseText += `CRITICAL: ⛔ HABIT-FORMING / ADDICTION RISK.\n`;
+                 onlineRiskDetected = true;
              }
              if (isChildbearingAge && (lowerEx.includes("pregnancy category d") || lowerEx.includes("pregnancy category x") || lowerEx.includes("fetal harm"))) {
                  responseText += `CRITICAL: 🤰 PREGNANCY WARNING DETECTED IN TEXT.\n`;
+                 onlineRiskDetected = true;
              }
              
              responseText += `**Contraindications**:\n`;
@@ -718,6 +766,7 @@ export const sendMessageToGemini = async (
              responseText += `\n**Side Effects**: Consult a physician for detailed side effects.\n`;
 
              responseText += `[BUY:${drugName}]\n`;
+             responseText += `[WEB:${drugName}]\n`;
              responseText += `SUMMARY: **${drugName}**: ${formatSentences(wiki.extract, 1)} \n\n`;
          } 
          else if (fda) {
@@ -743,16 +792,24 @@ export const sendMessageToGemini = async (
              const combinedFDA = (fda.warnings + " " + fda.purpose).toLowerCase();
              if (isChildbearingAge && (combinedFDA.includes("pregnancy") && (combinedFDA.includes("unsafe") || combinedFDA.includes("avoid") || combinedFDA.includes("fetal")))) {
                  responseText += `CRITICAL: 🤰 FDA LABELING MENTIONS PREGNANCY RISKS.\n`;
+                 onlineRiskDetected = true;
              }
              if (combinedFDA.includes("addict") || combinedFDA.includes("dependence")) {
                  responseText += `CRITICAL: ⛔ HABIT-FORMING / ADDICTION RISK.\n`;
+                 onlineRiskDetected = true;
              }
 
              responseText += `\n**Side Effects**: ${formatSentences(fda.sideEffects, 2)}\n`;
 
              responseText += `[BUY:${fda.brand}]\n`;
+             responseText += `[WEB:${fda.brand}]\n`;
              responseText += `SUMMARY: **${fda.brand}** is identified for: ${formatSentences(fda.purpose, 1)}\n\n`;
          }
+     }
+
+     if (onlineRiskDetected && profileIncomplete) {
+          const t = UI_TRANSLATIONS[language as keyof typeof UI_TRANSLATIONS] || UI_TRANSLATIONS['en'];
+          responseText += `\n[RED]${t.askRisk || "CRITICAL: High risk medication detected. Please confirm your Age and Pregnancy Status."}[/RED]`;
      }
 
      if (!foundOnline) {

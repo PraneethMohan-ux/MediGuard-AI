@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ChatMessage } from '../types';
-import { AlertTriangle, ExternalLink, ShoppingCart, User, Bot, Sparkles, Globe, AlertOctagon, BookOpen } from 'lucide-react';
+import { AlertTriangle, ExternalLink, ShoppingCart, User, Bot, Sparkles, Globe, AlertOctagon } from 'lucide-react';
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -33,41 +33,21 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         );
       }
 
-      // Web Search Button Trigger (Offline Fallback)
+      // Web Search Button Trigger (Offline Fallback & Supplement)
       const webMatch = line.match(/\[WEB:(.*?)\]/);
       if (webMatch) {
           const query = webMatch[1];
           return (
             <div key={lineIndex} className="mt-4 mb-2 animate-fade-in flex flex-col gap-2">
                 <a
-                href={`https://www.google.com/search?q=${encodeURIComponent(query + ' medicine side effects NLEM 2022 indian pharmacopoeia')}`}
+                href={`https://www.google.com/search?q=${encodeURIComponent(query + ' medication uses contraindication')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-md w-full justify-center"
                 >
                 <Globe size={18} />
-                Search Google (Safety)
+                Search Google (Uses & Contraindications)
                 </a>
-                <div className="flex gap-2">
-                    <a
-                    href={`https://nida.nih.gov/search?q=${encodeURIComponent(query)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-purple-700 transition shadow-sm justify-center text-sm"
-                    >
-                    <BookOpen size={18} />
-                    NIDA
-                    </a>
-                    <a
-                    href={`https://www.1mg.com/search/all?name=${encodeURIComponent(query)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-200 px-4 py-3 rounded-xl font-bold hover:bg-gray-50 transition shadow-sm justify-center text-sm"
-                    >
-                    <ExternalLink size={18} />
-                    1mg
-                    </a>
-                </div>
             </div>
           );
       }
