@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediGuard AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              surface: '#fdfcff',
+              'surface-variant': '#e0e2ec',
+              primary: '#006a6a',
+              'primary-container': '#6ff7f7',
+              secondary: '#4a6363',
+              tertiary: '#4b607c',
+            },
+            animation: {
+              'flash': 'flash 0.5s ease-out forwards',
+              'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+            },
+            keyframes: {
+              flash: {
+                '0%': { opacity: '1', backgroundColor: 'white' },
+                '100%': { opacity: '0', pointerEvents: 'none' },
+              },
+              shake: {
+                '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f3f4f6;
+        transition: filter 0.5s ease, background-color 0.5s ease, color 0.5s ease;
+      }
+
+      /* Dark Mode Global Overrides - Pure Black */
+      .dark body {
+        background-color: #000000;
+        color: #f5f5f5;
+      }
+      
+      /* Scrollbar */
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+      /* Easter Egg Themes */
+      body.theme-bw {
+        filter: grayscale(100%);
+      }
+      
+      body.theme-neon {
+        background-color: #000000 !important;
+        color: #00ff00 !important;
+        filter: contrast(1.2) saturate(1.5);
+      }
+      body.theme-neon div {
+        border-color: #00ff00 !important;
+      }
+      body.theme-neon .bg-white {
+        background-color: #111111 !important;
+        color: #00ff00 !important;
+      }
+
+      /* Animations */
+      .bomb-overlay {
+        position: fixed;
+        inset: 0;
+        background: black;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 5rem;
+        animation: shake 0.5s infinite;
+      }
+
+      .flash-screen {
+        position: fixed;
+        inset: 0;
+        background: white;
+        z-index: 101;
+        animation: flash 1s forwards;
+        pointer-events: none;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
+    "vite": "https://esm.sh/vite@^7.2.7",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
