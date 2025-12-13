@@ -1,7 +1,7 @@
 
 import { UserProfile, ChatMessage } from "../types";
 
-// Enhanced Drug Database based on Indian Pharmacopoeia (IP) Standards
+// Enhanced Drug Database based on Indian Pharmacopoeia (IP) & NLEM 2022 Standards
 interface DrugInfo {
   class: string;
   indication: string;
@@ -16,11 +16,11 @@ interface DrugInfo {
   pregnancyUnsafe: boolean; // Pregnancy Category D/X or generally unsafe
 }
 
-// A comprehensive list of common drugs in India
+// A comprehensive list of common drugs in India (Updated with NLEM 2022)
 const DRUG_DB: Record<string, DrugInfo> = {
   // --- PAIN & FEVER ---
   "paracetamol": {
-    class: "Analgesic & Antipyretic (IP)",
+    class: "Analgesic & Antipyretic (NLEM 2022)",
     indication: "Fever, Mild Pain",
     schedule: "OTC",
     kidney: "Safe in normal doses. Adjustment needed in severe renal failure.",
@@ -28,7 +28,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     interactions: ["Warfarin", "Alcohol", "Isoniazid"],
     sideEffects: ["Nausea", "Allergic reactions"],
     warnings: ["Do not exceed 4g per 24 hours.", "Contraindicated in severe liver failure."],
-    bbb: true, // Crosses freely
+    bbb: true, 
     habitForming: false,
     pregnancyUnsafe: false
   },
@@ -59,7 +59,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: false
   },
   "ibuprofen": {
-    class: "NSAID (IP)",
+    class: "NSAID (NLEM 2022)",
     indication: "Pain, Inflammation",
     schedule: "Schedule H",
     kidney: "WARNING: Can cause acute kidney injury. Avoid in CKD.",
@@ -72,7 +72,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: true // Avoid, esp in 3rd trimester
   },
   "diclofenac": {
-    class: "NSAID (IP)",
+    class: "NSAID (NLEM 2022)",
     indication: "Pain, Arthritis",
     schedule: "Schedule H",
     kidney: "High risk of renal impairment with long-term use.",
@@ -85,7 +85,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: true
   },
   "tramadol": {
-    class: "Opioid Analgesic (IP)",
+    class: "Opioid Analgesic (NLEM 2022)",
     indication: "Moderate to Severe Pain",
     schedule: "Schedule H1 (Strict Warning)",
     kidney: "Reduce dose in renal impairment.",
@@ -98,9 +98,76 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: true
   },
 
+  // --- NLEM 2022 ADDITIONS ---
+  "ivermectin": {
+    class: "Anthelminthic & Antifilarial (NLEM 2022)",
+    indication: "Filariasis, Strongyloidiasis, Scabies",
+    schedule: "Schedule H",
+    kidney: "Safe.",
+    liver: "Use with caution.",
+    interactions: ["Warfarin"],
+    sideEffects: ["Fever", "Pruritus", "Skin rash", "Dizziness"],
+    warnings: ["Take on an empty stomach with water.", "Mazzotti reaction possible in onchocerciasis treatment."],
+    bbb: false,
+    habitForming: false,
+    pregnancyUnsafe: true // Category C
+  },
+  "amikacin": {
+    class: "Aminoglycoside Antibiotic (NLEM 2022)",
+    indication: "Serious bacterial infections (MDR-TB, Hospital-acquired)",
+    schedule: "Schedule H",
+    kidney: "WARNING: Nephrotoxic. Strict monitoring required.",
+    liver: "Safe.",
+    interactions: ["Furosemide", "Amphotericin B", "Muscle relaxants"],
+    sideEffects: ["Hearing loss (Ototoxicity)", "Kidney damage", "Balance problems"],
+    warnings: ["Monitor auditory and renal function.", "Ensure adequate hydration."],
+    bbb: false,
+    habitForming: false,
+    pregnancyUnsafe: true // Category D
+  },
+  "bedaquiline": {
+    class: "Diarylquinoline Antitubercular (NLEM 2022)",
+    indication: "Multidrug-resistant Tuberculosis (MDR-TB)",
+    schedule: "Schedule H1",
+    kidney: "Use with caution.",
+    liver: "Avoid in severe hepatic impairment.",
+    interactions: ["Rifampicin (CYP3A4 inducers)", "QT prolonging drugs"],
+    sideEffects: ["Headache", "Nausea", "QT prolongation", "Joint pain"],
+    warnings: ["Boxed Warning: QT prolongation (Monitor ECG).", "Increased risk of death observed in trials."],
+    bbb: false,
+    habitForming: false,
+    pregnancyUnsafe: true // Category B
+  },
+  "delamanid": {
+    class: "Antitubercular (NLEM 2022)",
+    indication: "MDR-TB",
+    schedule: "Schedule H1",
+    kidney: "Safe.",
+    liver: "Caution.",
+    interactions: ["QT prolonging drugs"],
+    sideEffects: ["Dizziness", "Tremor", "QT prolongation"],
+    warnings: ["Monitor ECG for QT prolongation.", "Take with food."],
+    bbb: false,
+    habitForming: false,
+    pregnancyUnsafe: true
+  },
+  "itraconazole": {
+    class: "Azole Antifungal (NLEM 2022)",
+    indication: "Fungal infections (Aspergillosis, Blastomycosis)",
+    schedule: "Schedule H",
+    kidney: "Caution.",
+    liver: "Monitor liver function.",
+    interactions: ["Simvastatin", "Midazolam", "Antacids"],
+    sideEffects: ["Nausea", "Abdominal pain", "Liver toxicity"],
+    warnings: ["Take with food for better absorption.", "Contraindicated in heart failure."],
+    bbb: false,
+    habitForming: false,
+    pregnancyUnsafe: true // Category C
+  },
+
   // --- ANTIBIOTICS ---
   "amoxicillin": {
-    class: "Penicillin Antibiotic (IP)",
+    class: "Penicillin Antibiotic (NLEM 2022)",
     indication: "Bacterial Infections",
     schedule: "Schedule H",
     kidney: "Dose adjustment required in renal failure.",
@@ -113,7 +180,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: false
   },
   "azithromycin": {
-    class: "Macrolide Antibiotic (IP)",
+    class: "Macrolide Antibiotic (NLEM 2022)",
     indication: "Respiratory & Throat Infections",
     schedule: "Schedule H",
     kidney: "Safe.",
@@ -126,7 +193,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: false
   },
   "ciprofloxacin": {
-    class: "Fluoroquinolone Antibiotic (IP)",
+    class: "Fluoroquinolone Antibiotic (NLEM 2022)",
     indication: "UTI, Bacterial Infections",
     schedule: "Schedule H",
     kidney: "Dose adjustment needed.",
@@ -141,7 +208,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
 
   // --- DIABETES ---
   "metformin": {
-    class: "Biguanide (IP)",
+    class: "Biguanide (NLEM 2022)",
     indication: "Type 2 Diabetes",
     schedule: "Schedule H",
     kidney: "Contraindicated in severe renal impairment (eGFR < 30).",
@@ -154,7 +221,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: false // Generally considered safer than others, but insulin preferred
   },
   "glimepiride": {
-    class: "Sulfonylurea (IP)",
+    class: "Sulfonylurea (NLEM 2022)",
     indication: "Type 2 Diabetes",
     schedule: "Schedule H",
     kidney: "Use with caution.",
@@ -169,7 +236,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
 
   // --- HYPERTENSION & HEART ---
   "amlodipine": {
-    class: "Calcium Channel Blocker (IP)",
+    class: "Calcium Channel Blocker (NLEM 2022)",
     indication: "Hypertension",
     schedule: "Schedule H",
     kidney: "Safe.",
@@ -182,7 +249,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: false // Category C, use if benefit > risk
   },
   "telmisartan": {
-    class: "ARB (IP)",
+    class: "ARB (NLEM 2022)",
     indication: "Hypertension",
     schedule: "Schedule H",
     kidney: "Monitor Potassium levels.",
@@ -195,7 +262,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: true // Category D
   },
   "atorvastatin": {
-    class: "Statin (IP)",
+    class: "Statin (NLEM 2022)",
     indication: "High Cholesterol",
     schedule: "Schedule H",
     kidney: "Safe.",
@@ -210,7 +277,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
 
   // --- GASTRIC ---
   "pantoprazole": {
-    class: "Proton Pump Inhibitor (IP)",
+    class: "Proton Pump Inhibitor (NLEM 2022)",
     indication: "Acidity, GERD",
     schedule: "Schedule H",
     kidney: "Safe.",
@@ -223,7 +290,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: false
   },
   "domperidone": {
-    class: "Prokinetic (IP)",
+    class: "Prokinetic (NLEM 2022)",
     indication: "Nausea, Vomiting",
     schedule: "Schedule H",
     kidney: "Adjust dose.",
@@ -238,7 +305,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
 
   // --- ALLERGY ---
   "cetirizine": {
-    class: "Antihistamine (IP)",
+    class: "Antihistamine (NLEM 2022)",
     indication: "Allergy, Cold",
     schedule: "Schedule H",
     kidney: "Reduce dose.",
@@ -251,7 +318,7 @@ const DRUG_DB: Record<string, DrugInfo> = {
     pregnancyUnsafe: false
   },
   "montelukast": {
-    class: "Leukotriene Receptor Antagonist (IP)",
+    class: "Leukotriene Receptor Antagonist (NLEM 2022)",
     indication: "Asthma, Allergy",
     schedule: "Schedule H",
     kidney: "Safe.",
@@ -285,15 +352,18 @@ const DRUG_DB: Record<string, DrugInfo> = {
 // Extract complete sentences to avoid truncation like "indicat..."
 const formatSentences = (text: string, maxSentences: number = 2): string => {
     if (!text) return "Details not available in standard format.";
-    // Clean whitespace
-    const clean = text.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, " ").trim();
+    
+    // Remove trailing ellipses or junk
+    let clean = text.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, " ").trim();
+    clean = clean.replace(/\.\.\.$/, ""); // Remove "..." at end
+
     // Regex matches sequences that end with . ! or ?
     const matches = clean.match(/[^.!?]+[.!?]+/g);
     
     if (!matches) {
-        // Fallback for text without clear punctuation (lists, short phrases)
-        // Ensure it ends with a period if it looks like a sentence
-        return clean.endsWith('.') ? clean : clean + '.';
+        // Fallback: If no punctuation, try to ensure it ends cleanly
+        // If > 20 chars and no punctuation, append '.'
+        return clean.length > 20 && !clean.endsWith('.') ? clean + '.' : clean;
     }
     
     // Join the desired number of sentences
@@ -310,14 +380,27 @@ const extractWarnings = (text: string, limit: number = 3): string[] => {
     const keywords = [
         "contraindicat", "avoid", "do not", "unsafe", "risk", "warning", 
         "danger", "prohibit", "consult", "harm", "monitor", "caution", 
-        "severe", "fatal", "pregnancy", "breastfeeding", "allerg"
+        "severe", "fatal", "pregnancy", "breastfeeding", "allerg", "should not",
+        "adverse", "stop"
     ];
     
     // Filter sentences containing keywords
     const found = sentences.filter(s => keywords.some(k => s.toLowerCase().includes(k)));
     
-    // Deduplicate and return unique sentences up to limit
-    return [...new Set(found)].slice(0, limit);
+    // Deduplicate
+    const unique = [...new Set(found)];
+    
+    // If we have less than 2, try to pad with generic warnings if text suggests risk
+    if (unique.length < 2) {
+       if (clean.toLowerCase().includes("doctor") && !unique.some(s => s.toLowerCase().includes("doctor"))) {
+           unique.push("Consult your doctor for full safety profile.");
+       }
+       if (clean.toLowerCase().includes("label") && !unique.some(s => s.toLowerCase().includes("label"))) {
+           unique.push("Refer to package insert for complete contraindications.");
+       }
+    }
+
+    return unique.slice(0, limit);
 };
 
 function isMedicalContext(text: string): boolean {
@@ -393,7 +476,20 @@ async function fetchOpenFDAData(query: string, apiKey?: string): Promise<{ brand
         const info = data.results[0];
         const openfda = info.openfda || {};
         
-        const getText = (arr: string[]) => arr && arr.length > 0 ? arr[0].substring(0, 1500).replace(/(\r\n|\n|\r)/gm, " ") : "";
+        // Helper to get clean text and ensure it ends with a sentence boundary, max 1500 chars
+        const getText = (arr: string[]) => {
+            if (!arr || arr.length === 0) return "";
+            let t = arr[0];
+            if (t.length > 1500) {
+                t = t.substring(0, 1500);
+                // Cut at last period to avoid "indicat..."
+                const lastDot = t.lastIndexOf('.');
+                if (lastDot > 100) { // Ensure we have a decent chunk
+                    t = t.substring(0, lastDot + 1);
+                }
+            }
+            return t.replace(/(\r\n|\n|\r)/gm, " ");
+        };
         
         // Extract Pharmacologic Class
         const pharmClass = openfda.pharm_class_epc ? openfda.pharm_class_epc[0] : (openfda.pharm_class_pe ? openfda.pharm_class_pe[0] : "Unspecified Pharmacologic Class");
@@ -606,12 +702,16 @@ export const sendMessageToGemini = async (
              const warnings = extractWarnings(wiki.extract);
              if (warnings.length > 0) {
                  warnings.forEach(w => responseText += `[RED]• ${w}[/RED]\n`);
-                 if (warnings.length < 2) responseText += `[RED]• Consult doctor for additional safety information.[/RED]\n`;
+                 if (warnings.length < 2) {
+                    responseText += `[RED]• Consult doctor for additional safety information.[/RED]\n`;
+                 }
              } else {
                  if (lowerEx.includes("contraindicat") || lowerEx.includes("warning")) {
                      responseText += `[RED]• Potential warnings detected. Check official sources.[/RED]\n`;
+                     responseText += `[RED]• Consult doctor for details.[/RED]\n`;
                  } else {
                      responseText += `[RED]• No specific contraindications extracted. Consult a doctor.[/RED]\n`;
+                     responseText += `[RED]• Check interactions manually.[/RED]\n`;
                  }
              }
 

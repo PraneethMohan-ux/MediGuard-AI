@@ -40,7 +40,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
           return (
             <div key={lineIndex} className="mt-4 mb-2 animate-fade-in flex flex-col gap-2">
                 <a
-                href={`https://www.google.com/search?q=${encodeURIComponent(query + ' medicine side effects indian pharmacopoeia')}`}
+                href={`https://www.google.com/search?q=${encodeURIComponent(query + ' medicine side effects NLEM 2022 indian pharmacopoeia')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-md w-full justify-center"

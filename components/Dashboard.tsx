@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { UserProfile, AppScreen, Language, UI_TRANSLATIONS } from '../types';
-import { Activity, ShieldCheck, Pill, ArrowRight, UserPlus, Phone, AlertCircle } from 'lucide-react';
+import { ShieldCheck, UserPlus, Phone, AlertCircle, Download, Search, MessageSquare } from 'lucide-react';
 
 interface DashboardProps {
   profile: UserProfile | null;
@@ -15,8 +16,30 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, onNavigate, onLogin, lan
     name: '', email: '', age: '', gender: 'Unknown', 
     kidneyFunction: 'Normal', liverFunction: 'Normal', currentMeds: ''
   });
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   const t = UI_TRANSLATIONS[language] || UI_TRANSLATIONS['en'];
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult: any) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        }
+        setDeferredPrompt(null);
+      });
+    }
+  };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,37 +53,44 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, onNavigate, onLogin, lan
   };
 
   return (
-    <div className="p-6 space-y-6 pb-24 animate-fade-in h-full overflow-y-auto">
+    <div className="p-6 space-y-8 pb-24 animate-fade-in h-full overflow-y-auto">
       
       {/* Introduction */}
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold text-primary dark:text-teal-400">MediGuard AI</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">{t.subtitle || "Your personal medical assistant"}</p>
+      <div className="space-y-1 flex justify-between items-start">
+        <div>
+            <h1 className="text-3xl font-bold text-primary dark:text-teal-400">MediGuard AI</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">{t.subtitle || "Your personal medical assistant"}</p>
+        </div>
+        {deferredPrompt && (
+            <button 
+                onClick={handleInstallClick}
+                className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-lg animate-pulse"
+            >
+                <Download size={14} /> Install App
+            </button>
+        )}
       </div>
 
-      {/* Feature Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div onClick={() => onNavigate('chat')} className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:shadow-md transition border border-blue-100 dark:border-blue-900/30">
-           <div className="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-full text-blue-600 dark:text-blue-300"><Pill size={24} /></div>
-           <div>
-              <h3 className="font-bold text-gray-800 dark:text-gray-100">{t.checkInteraction || "Drug Interactions"}</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Check safety</p>
-           </div>
-        </div>
-        <div onClick={() => onNavigate('chat')} className="bg-green-50 dark:bg-green-900/10 p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:shadow-md transition border border-green-100 dark:border-green-900/30">
-           <div className="bg-green-100 dark:bg-green-900/40 p-3 rounded-full text-green-600 dark:text-green-300"><ShieldCheck size={24} /></div>
-           <div>
-              <h3 className="font-bold text-gray-800 dark:text-gray-100">{t.safeDosage || "Safe Dosage"}</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Age-based forecast</p>
-           </div>
-        </div>
-        <div onClick={() => onNavigate('chat')} className="bg-purple-50 dark:bg-purple-900/10 p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:shadow-md transition border border-purple-100 dark:border-purple-900/30">
-           <div className="bg-purple-100 dark:bg-purple-900/40 p-3 rounded-full text-purple-600 dark:text-purple-300"><Activity size={24} /></div>
-           <div>
-              <h3 className="font-bold text-gray-800 dark:text-gray-100">{t.sideEffects || "Side Effects"}</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Risk analysis</p>
-           </div>
-        </div>
+      {/* Hero Search Section */}
+      <div className="bg-gradient-to-br from-primary/10 to-transparent dark:from-teal-900/20 p-8 rounded-[32px] border border-primary/10 dark:border-teal-800/30 text-center space-y-6 shadow-sm">
+          <div className="w-24 h-24 bg-white dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto shadow-sm text-primary dark:text-teal-400">
+              <Search size={48} strokeWidth={1.5} />
+          </div>
+          <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white leading-tight">
+                  Find your medication<br/>at your fingertips
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Instant access to NLEM 2022 & Pharmacopoeia data
+              </p>
+          </div>
+          <button 
+            onClick={() => onNavigate('chat')}
+            className="w-full max-w-xs mx-auto bg-primary dark:bg-teal-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+          >
+              <MessageSquare size={20} />
+              Start Search
+          </button>
       </div>
 
       {/* Member Access Widget */}
